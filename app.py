@@ -5,7 +5,7 @@ import os
 app = FastAPI()
 
 # Define the path to your GIF file
-GIF_PATH = os.path.join(os.getcwd(), "image.gif")
+GIF_PATH = os.path.join(os.getcwd(), "image.jpg")
 
 @app.get("/image")
 async def get_image():
