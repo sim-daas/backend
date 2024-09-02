@@ -13,6 +13,6 @@ async def get_image():
     Serve the GIF as a response.
     """
     if os.path.exists(GIF_PATH):
-        return FileResponse(GIF_PATH, media_type="image/gif")
+        return FileResponse(GIF_PATH, media_type="image/jpg")
     else:
         return {"error": "GIF not found"}
