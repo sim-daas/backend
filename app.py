@@ -27,17 +27,20 @@ import os
 app = FastAPI()
 
 # MongoDB client setup (replace with your MongoDB URI)
-MONGO_URI = os.getenv('MONGO_URI', 'mongodb+srv://<username>:<password>@cluster.mongodb.net/<database>?retryWrites=true&w=majority')
+MONGO_URI = os.getenv('MONGO_URI')
 client = MongoClient(MONGO_URI)
 db = client["your_database"]
 collection = db["submissions"]
 
 # Pydantic model for form data validation
+
+
 class Submission(BaseModel):
     name: str
     email: EmailStr
     subject: str = None
     reason: str
+
 
 @app.post("/submit")
 def submit_form(
@@ -57,4 +60,3 @@ def submit_form(
     # Insert into MongoDB
     result = collection.insert_one(submission_data)
     return {"message": "Submission successful", "id": str(result.inserted_id)}
-
