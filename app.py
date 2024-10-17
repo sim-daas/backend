@@ -26,6 +26,16 @@ import os
 
 app = FastAPI()
 
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Can be adjusted to the exact origin if needed
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # MongoDB client setup (replace with your MongoDB URI)
 MONGO_URI = os.getenv('MONGO_URI')
 client = MongoClient(MONGO_URI)
