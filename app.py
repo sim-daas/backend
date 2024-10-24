@@ -52,7 +52,7 @@ def submit_form(
 
 class MealFeedback(BaseModel):
     meal: str
-    rating: int = Field(..., ge=0, le=10)
+    rating: int
     message: str
 
 @app.post("/submit_meal")
