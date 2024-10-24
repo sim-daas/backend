@@ -1,24 +1,3 @@
-'''
-from fastapi import FastAPI
-from fastapi.responses import FileResponse
-import os
-
-app = FastAPI()
-
-# Define the path to your GIF file
-GIF_PATH = os.path.join(os.getcwd(), "image.jpg")
-
-@app.get("/image")
-async def get_image():
-    """
-    Serve the GIF as a response.
-    """
-    if os.path.exists(GIF_PATH):
-        return FileResponse(GIF_PATH, media_type="image/jpg")
-    else:
-        return {"error": "GIF not found"}
-'''
-
 from fastapi import FastAPI, Form
 from pymongo import MongoClient
 from pydantic import BaseModel, EmailStr
@@ -70,3 +49,22 @@ def submit_form(
     # Insert into MongoDB
     result = collection.insert_one(submission_data)
     return {"message": "Submission successful", "id": str(result.inserted_id)}
+
+class MealFeedback(BaseModel):
+    meal: str
+    rating: int = Field(..., ge=0, le=10)
+    message: str
+
+@app.post("/submit_meal")
+def submit_meal(
+    meal: str = Form(...),
+    rating: int = Form(...),
+    message: str = Form(...)
+):
+    feedback_data = {
+        "meal": meal,
+        "rating": rating,
+        "message": message
+    }
+    result = meal_collection.insert_one(feedback_data)
+    return {"message": "Feedback submitted successfully", "id": str(result.inserted_id)}
