@@ -20,6 +20,7 @@ MONGO_URI = os.getenv('MONGO_URI')
 client = MongoClient(MONGO_URI)
 db = client["your_database"]
 collection = db["submissions"]
+meal_collection = db["meal_feedback"]
 
 # Pydantic model for form data validation
 
