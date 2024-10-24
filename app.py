@@ -69,3 +69,16 @@ def submit_meal(
     }
     result = meal_collection.insert_one(feedback_data)
     return {"message": "Feedback submitted successfully", "id": str(result.inserted_id)}
+
+@app.get("/average_ratings")
+def get_average_ratings():
+    pipeline = [
+        {
+            "$group": {
+                "_id": "$meal",
+                "average_rating": {"$avg": "$rating"}
+            }
+        }
+    ]
+    averages = list(meal_collection.aggregate(pipeline))
+    return {"average_ratings": averages}
