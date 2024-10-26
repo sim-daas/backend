@@ -5,16 +5,6 @@ import os
 
 app = FastAPI()
 
-from fastapi.middleware.cors import CORSMiddleware
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Can be adjusted to the exact origin if needed
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 # MongoDB client setup (replace with your MongoDB URI)
 MONGO_URI = os.getenv('MONGO_URI')
 client = MongoClient(MONGO_URI)
@@ -51,10 +41,12 @@ def submit_form(
     result = collection.insert_one(submission_data)
     return {"message": "Submission successful", "id": str(result.inserted_id)}
 
+
 class MealFeedback(BaseModel):
     meal: str
     rating: int
     message: str
+
 
 @app.post("/submit_meal")
 def submit_meal(
@@ -69,6 +61,7 @@ def submit_meal(
     }
     result = meal_collection.insert_one(feedback_data)
     return {"message": "Feedback submitted successfully", "id": str(result.inserted_id)}
+
 
 @app.get("/average_ratings")
 def get_average_ratings():
