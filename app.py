@@ -75,3 +75,12 @@ def get_average_ratings():
     ]
     averages = list(meal_collection.aggregate(pipeline))
     return {"average_ratings": averages}
+
+@app.get("/admin/view_feedback")
+def view_feedback_by_rating(rating: int = Query(..., ge=0, le=10)):
+    feedbacks = list(meal_collection.find({"rating": rating}, {"_id": 0, "message": 1}))
+
+    if not feedbacks:
+        raise HTTPException(status_code=404, detail="No feedback found with the specified rating")
+
+    return {"feedbacks": feedbacks}
