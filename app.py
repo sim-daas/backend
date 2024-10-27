@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Form
+from fastapi import FastAPI, Form, Query, HTTPException
 from pymongo import MongoClient
 from pydantic import BaseModel, EmailStr
 import os
