@@ -59,17 +59,19 @@ def submit_meal(
 ):
 
    weekday = datetime.now().strftime('%A')
+   current_date = datetime.now().strftime("%Y-%m-%d")  # e.g., "2024-10-27"
 
     feedback_data = {
         "meal": meal,
         "rating": rating,
         "message": message,
-        "weekday": weekday
+        "weekday": weekday,
+        "date": current_date
     }
     result = meal_collection.insert_one(feedback_data)
     return {"message": "Feedback submitted successfully", "id": str(result.inserted_id)}
 
-
+'''
 @app.get("/average_ratings")
 def get_average_ratings():
     pipeline = [
@@ -82,6 +84,28 @@ def get_average_ratings():
     ]
     averages = list(meal_collection.aggregate(pipeline))
     return {"average_ratings": averages}
+'''
+
+@app.get("/average_ratings")
+def get_average_rating(meal: Optional[str] = None):
+    # Get current date in YYYY-MM-DD format
+    current_date = datetime.now().strftime("%Y-%m-%d")
+
+    # Build the query to filter by date and optionally by meal
+    query = {"date": current_date}
+    if meal:
+        query["meal"] = meal
+
+    # Retrieve ratings for the current date and specified meal (if any)
+    ratings = meal_collection.find(query, {"rating": 1})
+
+    # Calculate the average rating
+    ratings_list = [entry["rating"] for entry in ratings]
+    if not ratings_list:
+        raise HTTPException(status_code=404, detail="No ratings found for today.")
+
+    average_rating = sum(ratings_list) / len(ratings_list)
+    return {"average_rating": average_rating, "date": current_date, "meal": meal if meal else "all meals"}
 
 @app.get("/get_meal_submissions")
 def get_meal_submissions(
@@ -106,3 +130,31 @@ def get_meal_submissions(
 
     return {"data": results}
 
+def is_admin(auth_key: str):
+    if auth_key != ADMIN_KEY:
+        raise HTTPException(status_code=403, detail="Unauthorized access")
+
+@app.delete("/delete_meal_feedback")
+def delete_meal_feedback(
+    auth_key: str = Depends(is_admin),
+    start_date: Optional[str] = Query(None, description="Start date in YYYY-MM-DD format"),
+    end_date: Optional[str] = Query(None, description="End date in YYYY-MM-DD format")
+):
+    # Check if both start_date and end_date are provided
+    if start_date and end_date:
+        # Validate date format and build query
+        try:
+            start = datetime.strptime(start_date, "%Y-%m-%d")
+            end = datetime.strptime(end_date, "%Y-%m-%d")
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD.")
+
+        # Create query to delete entries within the specified date range
+        query = {"date": {"$gte": start_date, "$lte": end_date}}
+    else:
+        # No date range provided, delete all documents
+        query = {}
+
+    # Perform deletion
+    result = meal_collection.delete_many(query)
+    return {"message": f"Deleted {result.deleted_count} entries from the meal_feedback collection"}
