@@ -2,6 +2,8 @@ from fastapi import FastAPI, Form, Query, HTTPException
 from pymongo import MongoClient
 from pydantic import BaseModel, EmailStr
 import os
+from datetime import datetime
+from typing import Optional
 
 app = FastAPI()
 
@@ -11,6 +13,7 @@ client = MongoClient(MONGO_URI)
 db = client["your_database"]
 collection = db["submissions"]
 meal_collection = db["meal_feedback"]
+ADMIN_KEY = os.getenv('ADMIN_KEY')
 
 # Pydantic model for form data validation
 
@@ -54,10 +57,14 @@ def submit_meal(
     rating: int = Form(...),
     message: str = Form(...)
 ):
+
+   weekday = datetime.now().strftime('%A')
+
     feedback_data = {
         "meal": meal,
         "rating": rating,
-        "message": message
+        "message": message,
+        "weekday": weekday
     }
     result = meal_collection.insert_one(feedback_data)
     return {"message": "Feedback submitted successfully", "id": str(result.inserted_id)}
@@ -76,11 +83,26 @@ def get_average_ratings():
     averages = list(meal_collection.aggregate(pipeline))
     return {"average_ratings": averages}
 
-@app.get("/admin/view_feedback")
-def view_feedback_by_rating(rating: int = Query(..., ge=0, le=10)):
-    feedbacks = list(meal_collection.find({"rating": rating}, {"_id": 0, "message": 1}))
+@app.get("/get_meal_submissions")
+def get_meal_submissions(
+    weekday: Optional[str] = Query(None, description="Filter by day of the week (e.g., 'Monday')"),
+    meal: Optional[str] = Query(None, description="Filter by meal type (e.g., 'breakfast', 'lunch')"),
+    rating: Optional[int] = Query(None, ge=0, le=10, description="Filter by rating between 0 and 10")
+):
+    # Build query dynamically based on provided filters
+    query = {}
+    if weekday:
+        query["weekday"] = weekday
+    if meal:
+        query["meal"] = meal
+    if rating is not None:  # Ensure that rating=0 can be queried
+        query["rating"] = rating
 
-    if not feedbacks:
-        raise HTTPException(status_code=404, detail="No feedback found with the specified rating")
+    # Retrieve matching documents
+    results = list(meal_collection.find(query, {"_id": 0}))  # Exclude the MongoDB '_id' field from the output
 
-    return {"feedbacks": feedbacks}
+    if not results:
+        return {"message": "No matching meal submissions found"}
+
+    return {"data": results}
+
