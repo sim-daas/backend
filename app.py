@@ -18,8 +18,6 @@ contactus = db["contactus"]
 newsletter_emails = db["subscribed_emails"]
 ADMIN_KEY = os.getenv('ADMIN_KEY')
 
-# Pydantic model for form data validation
-
 
 class Submission(BaseModel):
     name: str
