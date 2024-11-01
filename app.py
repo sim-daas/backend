@@ -110,6 +110,14 @@ def submit_meal(
     return {"message": "Feedback submitted successfully", "id": str(result.inserted_id)}
 
 
+@app.get("/subcemails")
+def get_average_rating(meal: Optional[str] = None):
+    emails = newsletter_emails.find(query)
+
+    # Calculate the average rating
+    return {"emails": emails}
+
+
 @app.get("/average_ratings")
 def get_average_rating(meal: Optional[str] = None):
     # Get current date in YYYY-MM-DD format
