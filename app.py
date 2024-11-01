@@ -111,7 +111,7 @@ def submit_meal(
 
 
 @app.get("/getmessages")
-def get_average_rating(meal: Optional[str] = None):
+def get_average_rating():
     messages = contactus.find({})
 
     # Calculate the average rating
@@ -119,7 +119,7 @@ def get_average_rating(meal: Optional[str] = None):
 
 
 @app.get("/subcemails")
-def get_average_rating(meal: Optional[str] = None):
+def get_average_rating():
     emails = newsletter_emails.find({})
 
     return {"emails": emails}
