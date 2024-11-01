@@ -13,6 +13,7 @@ client = MongoClient(MONGO_URI)
 db = client["your_database"]
 collection = db["submissions"]
 meal_collection = db["meal_feedback"]
+newsletter_emails = db["subscribed_emails"]
 ADMIN_KEY = os.getenv('ADMIN_KEY')
 
 # Pydantic model for form data validation
@@ -71,6 +72,17 @@ def submit_meal(
         "date": current_date
     }
     result = meal_collection.insert_one(feedback_data)
+    return {"message": "Feedback submitted successfully", "id": str(result.inserted_id)}
+
+
+@app.post("/getemails")
+def submit_meal(
+    email: str = Form(...)
+):
+    feedback_data = {
+        "email": email,
+    }
+    result = newsletter_emails.insert_one(feedback_data)
     return {"message": "Feedback submitted successfully", "id": str(result.inserted_id)}
 
 
