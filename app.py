@@ -32,12 +32,14 @@ def submit_form(
     subject: str = Form(None),
     reason: str = Form(...)
 ):
+    current_date = datetime.now().strftime("%Y-%m-%d")  # e.g., "2024-10-27"
     # Create a dictionary to save in MongoDB
     submission_data = {
         "name": name,
         "email": email,
         "subject": subject,
-        "reason": reason
+        "reason": reason,
+        "date": current_date
     }
 
     # Insert into MongoDB
@@ -70,22 +72,6 @@ def submit_meal(
     }
     result = meal_collection.insert_one(feedback_data)
     return {"message": "Feedback submitted successfully", "id": str(result.inserted_id)}
-
-
-'''
-@app.get("/average_ratings")
-def get_average_ratings():
-    pipeline = [
-        {
-            "$group": {
-                "_id": "$meal",
-                "average_rating": {"$avg": "$rating"}
-            }
-        }
-    ]
-    averages = list(meal_collection.aggregate(pipeline))
-    return {"average_ratings": averages}
-'''
 
 
 @app.get("/average_ratings")
