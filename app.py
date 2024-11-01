@@ -13,6 +13,7 @@ client = MongoClient(MONGO_URI)
 db = client["your_database"]
 collection = db["submissions"]
 meal_collection = db["meal_feedback"]
+contactus = db["contactus"]
 newsletter_emails = db["subscribed_emails"]
 ADMIN_KEY = os.getenv('ADMIN_KEY')
 
@@ -52,6 +53,29 @@ class MealFeedback(BaseModel):
     meal: str
     rating: int
     message: str
+
+
+@app.post("/postcontactus")
+def submit_meal(
+    name: str = Form(...),
+    phone: str = Form(...),
+    email: str = Form(...),
+    subject: str = Form(...),
+    message: str = Form(...)
+):
+
+    current_date = datetime.now().strftime("%Y-%m-%d")  # e.g., "2024-10-27"
+
+    feedback_data = {
+        "name": name,
+        "phone": phone,
+        "email": email,
+        "subject": subject,
+        "message": message,
+        "date": current_date
+    }
+    result = contactus.insert_one(feedback_data)
+    return {"message": "Feedback submitted successfully", "id": str(result.inserted_id)}
 
 
 @app.post("/submit_meal")
