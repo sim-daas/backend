@@ -4,6 +4,7 @@ from pydantic import BaseModel, EmailStr
 import os
 from datetime import datetime
 from typing import Optional
+from fastapi.encoders import jsonable_encoder
 
 app = FastAPI()
 
@@ -111,18 +112,19 @@ def submit_meal(
 
 
 @app.get("/getmessages")
-def get_average_rating():
+def get_messages():
     messages = contactus.find({})
-
-    # Calculate the average rating
-    return {"emails": messages}
+    # Convert cursor to list of dictionaries
+    message_list = [jsonable_encoder(message) for message in messages]
+    return {"messages": message_list}
 
 
 @app.get("/subcemails")
-def get_average_rating():
+def get_subscribed_emails():
     emails = newsletter_emails.find({})
-
-    return {"emails": emails}
+    # Convert cursor to list of dictionaries
+    email_list = [jsonable_encoder(email) for email in emails]
+    return {"emails": email_list}
 
 
 @app.get("/average_ratings")
