@@ -122,7 +122,6 @@ def get_average_rating(meal: Optional[str] = None):
 def get_average_rating(meal: Optional[str] = None):
     emails = newsletter_emails.find({})
 
-    # Calculate the average rating
     return {"emails": emails}
 
 
