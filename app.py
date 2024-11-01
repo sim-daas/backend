@@ -113,7 +113,7 @@ def submit_meal(
 
 @app.get("/getmessages")
 def get_messages():
-    messages = contactus.find({})
+    messages = contactus.find({}, {"_id": 0})
     # Convert cursor to list of dictionaries
     message_list = [jsonable_encoder(message) for message in messages]
     return {"messages": message_list}
@@ -121,7 +121,7 @@ def get_messages():
 
 @app.get("/subcemails")
 def get_subscribed_emails():
-    emails = newsletter_emails.find({})
+    emails = newsletter_emails.find({}, {"_id": 0})
     # Convert cursor to list of dictionaries
     email_list = [jsonable_encoder(email) for email in emails]
     return {"emails": email_list}
