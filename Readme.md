@@ -1,7 +1,3 @@
-Here is the complete `README.md` file in Markdown format:
-
----
-
 # FastAPI & MongoDB Backend
 
 A FastAPI backend service integrated with MongoDB, designed to handle form submissions, feedback, and newsletter subscriptions. This API is built to be scalable, efficient, and easy to integrate with any frontend, deployed seamlessly on Render.com.
@@ -174,12 +170,10 @@ This project is licensed under the MIT License.
 
 ## Contributing
 
-We welcome contributions to improve this project. Please fork the repository and create a pull request with detailed information about your changes.
+I welcome contributions to improve this project. Please fork the repository and create a pull request with detailed information about your changes.
 
 ---
 
 ## Acknowledgments
 
 Special thanks to the FastAPI and MongoDB communities for their extensive documentation and support.
-
----
