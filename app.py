@@ -8,6 +8,14 @@ from fastapi.encoders import jsonable_encoder
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow requests from any IP address or domain
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allow all headers
+)
+
 # MongoDB client setup (replace with your MongoDB URI)
 MONGO_URI = os.getenv('MONGO_URI')
 client = MongoClient(MONGO_URI)
