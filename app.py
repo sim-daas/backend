@@ -134,7 +134,7 @@ def get_subscribed_emails():
     email_list = [jsonable_encoder(email) for email in emails]
     return {"emails": email_list}
 
-
+'''
 @app.get("/average_ratings")
 def get_average_rating(meal: Optional[str] = None):
     # Get current date in YYYY-MM-DD format
@@ -156,7 +156,40 @@ def get_average_rating(meal: Optional[str] = None):
 
     average_rating = sum(ratings_list) / len(ratings_list)
     return {"average_rating": average_rating, "date": current_date, "meal": meal if meal else "all meals"}
+'''
+@app.get("/average_ratings")
+def get_average_rating(meal: Optional[str] = None):
+    current_date = datetime.now().strftime("%Y-%m-%d")  # Get current date in YYYY-MM-DD format
 
+    if meal:  # If a specific meal is provided
+        # Build the query to filter by date and meal
+        query = {"date": current_date, "meal": meal}
+        
+        # Retrieve ratings for the specified meal
+        ratings = meal_collection.find(query, {"rating": 1})
+        ratings_list = [entry["rating"] for entry in ratings]
+        
+        if not ratings_list:
+            raise HTTPException(status_code=404, detail=f"No ratings found for meal: {meal} on {current_date}")
+        
+        average_rating = sum(ratings_list) / len(ratings_list)
+        return {"meal": meal, "average_rating": average_rating, "date": current_date}
+    
+    # If no specific meal is provided, calculate averages for all meals
+    meal_types = ["breakfast", "lunch", "snack", "dinner"]
+    averages = {}
+    
+    for meal_type in meal_types:
+        query = {"date": current_date, "meal": meal_type}
+        ratings = meal_collection.find(query, {"rating": 1})
+        ratings_list = [entry["rating"] for entry in ratings]
+        
+        if ratings_list:  # Calculate average if ratings exist
+            averages[meal_type] = sum(ratings_list) / len(ratings_list)
+        else:  # No ratings for this meal type
+            averages[meal_type] = None
+    
+    return {"average_ratings": averages, "date": current_date}
 
 @app.get("/get_meal_submissions")
 def get_meal_submissions(
