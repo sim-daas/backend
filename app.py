@@ -5,9 +5,11 @@ import os
 from datetime import datetime
 from typing import Optional
 from fastapi.encoders import jsonable_encoder
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
+# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Allow requests from any IP address or domain
