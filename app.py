@@ -5,8 +5,18 @@ import os
 from datetime import datetime
 from typing import Optional
 from fastapi.encoders import jsonable_encoder
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow requests from any IP address or domain
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allow all headers
+)
 
 # MongoDB client setup (replace with your MongoDB URI)
 MONGO_URI = os.getenv('MONGO_URI')
@@ -125,29 +135,6 @@ def get_subscribed_emails():
     email_list = [jsonable_encoder(email) for email in emails]
     return {"emails": email_list}
 
-
-@app.get("/average_ratings")
-def get_average_rating(meal: Optional[str] = None):
-    # Get current date in YYYY-MM-DD format
-    current_date = datetime.now().strftime("%Y-%m-%d")
-
-    # Build the query to filter by date and optionally by meal
-    query = {"date": current_date}
-    if meal:
-        query["meal"] = meal
-
-    # Retrieve ratings for the current date and specified meal (if any)
-    ratings = meal_collection.find(query, {"rating": 1})
-
-    # Calculate the average rating
-    ratings_list = [entry["rating"] for entry in ratings]
-    if not ratings_list:
-        raise HTTPException(
-            status_code=404, detail="No ratings found for today.")
-
-    average_rating = sum(ratings_list) / len(ratings_list)
-    return {"average_rating": average_rating, "date": current_date, "meal": meal if meal else "all meals"}
-
 @app.get("/login_admin")
 def login_admin(
     email: str = Query(..., description="Admin's email"),
@@ -160,6 +147,41 @@ def login_admin(
         return {"success": True, "message": "Login successful"}
     else:
         return {"success": False, "message": "Invalid email or password"}
+
+@app.get("/average_ratings")
+def get_average_rating(meal: Optional[str] = None):
+    current_date = datetime.now().strftime("%Y-%m-%d")  # Get current date in YYYY-MM-DD format
+
+    if meal:  # If a specific meal is provided
+        # Build the query to filter by date and meal
+        query = {"date": current_date, "meal": meal}
+        
+        # Retrieve ratings for the specified meal
+        ratings = meal_collection.find(query, {"rating": 1})
+        ratings_list = [entry["rating"] for entry in ratings]
+        
+        if not ratings_list:
+            raise HTTPException(status_code=404, detail=f"No ratings found for meal: {meal} on {current_date}")
+        
+        average_rating = sum(ratings_list) / len(ratings_list)
+        return {"meal": meal, "average_rating": average_rating, "date": current_date}
+    
+    # If no specific meal is provided, calculate averages for all meals
+    meal_types = ["breakfast", "lunch", "snack", "dinner"]
+    averages = {}
+    
+    for meal_type in meal_types:
+        query = {"date": current_date, "meal": meal_type}
+        ratings = meal_collection.find(query, {"rating": 1})
+        ratings_list = [entry["rating"] for entry in ratings]
+        
+        if ratings_list:  # Calculate average if ratings exist
+            averages[meal_type] = sum(ratings_list) / len(ratings_list)
+        else:  # No ratings for this meal type
+            averages[meal_type] = None
+    
+    return {"average_ratings": averages, "date": current_date}
+>>>>>>> c9cd5dccb1c6f2867e81870d93fd56c26c10050b
 
 @app.get("/get_meal_submissions")
 def get_meal_submissions(
