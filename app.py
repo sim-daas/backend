@@ -16,6 +16,7 @@ collection = db["submissions"]
 meal_collection = db["meal_feedback"]
 contactus = db["contactus"]
 newsletter_emails = db["subscribed_emails"]
+admins_collection = db["admins"]
 ADMIN_KEY = os.getenv('ADMIN_KEY')
 
 
@@ -147,6 +148,18 @@ def get_average_rating(meal: Optional[str] = None):
     average_rating = sum(ratings_list) / len(ratings_list)
     return {"average_rating": average_rating, "date": current_date, "meal": meal if meal else "all meals"}
 
+@app.get("/login_admin")
+def login_admin(
+    email: str = Query(..., description="Admin's email"),
+    password: str = Query(..., description="Admin's password")
+):
+    # Query the admins collection for the given email and password
+    admin = admins_collection.find_one({"email": email, "password": password})
+    
+    if admin:
+        return {"success": True, "message": "Login successful"}
+    else:
+        return {"success": False, "message": "Invalid email or password"}
 
 @app.get("/get_meal_submissions")
 def get_meal_submissions(
