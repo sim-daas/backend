@@ -181,7 +181,6 @@ def get_average_rating(meal: Optional[str] = None):
             averages[meal_type] = None
     
     return {"average_ratings": averages, "date": current_date}
->>>>>>> c9cd5dccb1c6f2867e81870d93fd56c26c10050b
 
 @app.get("/get_meal_submissions")
 def get_meal_submissions(
