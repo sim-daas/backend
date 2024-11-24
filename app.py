@@ -135,7 +135,7 @@ def get_subscribed_emails():
     email_list = [jsonable_encoder(email) for email in emails]
     return {"emails": email_list}
 
-@app.get("/login_admin")
+@app.get("/admin_login")
 def login_admin(
     email: str = Query(..., description="Admin's email"),
     password: str = Query(..., description="Admin's password")
