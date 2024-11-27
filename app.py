@@ -122,7 +122,7 @@ def submit_meal(
 
 @app.get("/getmessages")
 def get_messages():
-    messages = contactus.find({}, {"_id": 0})
+    messages = collection.find({}, {"_id": 0})
     # Convert cursor to list of dictionaries
     message_list = [jsonable_encoder(message) for message in messages]
     return {"messages": message_list}
