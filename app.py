@@ -163,7 +163,7 @@ def get_average_rating(meal: Optional[str] = None):
         if not ratings_list:
             raise HTTPException(status_code=404, detail=f"No ratings found for meal: {meal} on {current_date}")
         
-        average_rating = sum(ratings_list) / len(ratings_list)
+        average_rating = sum(ratings_list) // len(ratings_list)
         return {"meal": meal, "average_rating": average_rating, "date": current_date}
     
     # If no specific meal is provided, calculate averages for all meals
@@ -176,7 +176,7 @@ def get_average_rating(meal: Optional[str] = None):
         ratings_list = [entry["rating"] for entry in ratings]
         
         if ratings_list:  # Calculate average if ratings exist
-            averages[meal_type] = sum(ratings_list) / len(ratings_list)
+            averages[meal_type] = sum(ratings_list) // len(ratings_list)
         else:  # No ratings for this meal type
             averages[meal_type] = None
     
