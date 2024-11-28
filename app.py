@@ -167,7 +167,7 @@ def get_average_rating(meal: Optional[str] = None):
         return {"meal": meal, "average_rating": average_rating, "date": current_date}
     
     # If no specific meal is provided, calculate averages for all meals
-    meal_types = ["breakfast", "lunch", "snack", "dinner"]
+    meal_types = ["breakfast", "lunch", "snacks", "dinner"]
     averages = {}
     
     for meal_type in meal_types:
