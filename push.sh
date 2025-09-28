@@ -1,3 +1,3 @@
 git add .
 git commit -m 'hello'
-git push -u origin main
+git push -u origin HEAD
